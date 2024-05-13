@@ -33,6 +33,7 @@ jobs:
         uses: softprops/turnstyle@v1
         with:
           same-branch-only: no
+          poll-interval-seconds: 120 # in seconds
 
       - name: Configure the S3 client
         run: |

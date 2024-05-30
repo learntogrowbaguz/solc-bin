@@ -1,1 +1,1 @@
-soljson-v0.8.27-nightly.2024.5.28+commit.15b99ca8.js
+soljson-v0.8.27-nightly.2024.5.29+commit.12b404f8.js

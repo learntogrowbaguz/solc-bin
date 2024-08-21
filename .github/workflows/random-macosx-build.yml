@@ -69,6 +69,7 @@ jobs:
           ref: v${{ env.SOLIDITY_VERSION }}
           path: solidity/
           fetch-depth: 0
+          submodules: 'recursive'
 
       - name: Install semver utility
         run: |

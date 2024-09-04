@@ -29,6 +29,30 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
 
+      - name: Free Disk Space Before Build
+        if: "env.PLATFORM == 'macosx-amd64'"
+        run: |
+          df -hI /dev/disk3s1s1
+          sudo rm -rf /Applications/Xcode_14.3.1.app
+          sudo rm -rf /Applications/Xcode_15.0.1.app
+          sudo rm -rf /Applications/Xcode_15.1.app
+          sudo rm -rf /Applications/Xcode_15.2.app
+          sudo rm -rf /Applications/Xcode_15.3.app
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" \
+            /opt/google/chrome \
+            /opt/microsoft/msedge \
+            /opt/microsoft/powershell \
+            /opt/pipx \
+            /usr/lib/mono \
+            /usr/local/julia* \
+            /usr/local/lib/android \
+            /usr/local/lib/node_modules \
+            /usr/local/share/chromium \
+            /usr/local/share/powershell \
+            /usr/share/dotnet \
+            /usr/share/swift
+          df -hI /dev/disk3s1s1
+
       - name: Symlink solc-bin to /mnt/solc-bin
         # It's now too big to fit on the main partition on Ubuntu. macOS runners are fine since
         # they apparently have >70 GB available, but on Ubuntu it's mostly filled with software.

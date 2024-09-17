@@ -11,7 +11,6 @@ import {
   readFileSync,
   writeFile,
   readdir,
-  stat,
   lstat
 } from 'fs'
 
@@ -68,33 +67,6 @@ function updateSymlinkSync (linkPathRelativeToRoot, targetRelativeToLink) {
     symlinkSync(targetRelativeToLink, absoluteLinkPath, 'file')
     console.log('Created link ' + linkPathRelativeToRoot + ' -> ' + targetRelativeToLink)
   }
-}
-
-function updateCopy (srcRelativeToRoot, destRelativeToRoot) {
-  readFileSync(join(__dirname, srcRelativeToRoot), function (err, data) {
-    if (err) {
-      throw err
-    }
-
-    const absoluteDest = join(__dirname, destRelativeToRoot)
-    stat(absoluteDest, function (err, stats) {
-      if (err && err.code !== 'ENOENT') {
-        throw err
-      }
-
-      // If the target is a symlink, we want to replace it with a copy rather than overwrite the file it links to
-      if (!err && stats.isSymbolicLink()) {
-        unlinkSync(absoluteDest)
-      }
-
-      writeFile(absoluteDest, data, function (err) {
-        if (err) {
-          throw err
-        }
-        console.log('Updated ' + destRelativeToRoot)
-      })
-    })
-  })
 }
 
 function deleteIfExists (filePathRelativeToRoot) {
@@ -301,8 +273,6 @@ function processDir (dir, options, listCallback) {
     })
 
     // Update 'latest' symlink (except for wasm/ where the link is hard-coded to point at the one in bin/).
-    // bin/ is a special case because we need to keep a copy rather than a symlink. The reason is that
-    // some tools (in particular solc-js) have hard-coded github download URLs to it and can't handle symlinks.
     if (dir !== '/wasm') {
       const releaseExtension = binaryExtensions.find(function (extension) { return latestReleaseFile.endsWith(extension) })
 
@@ -312,11 +282,7 @@ function processDir (dir, options, listCallback) {
         }
       })
 
-      if (dir === '/bin') {
-        updateCopy(join(dir, latestReleaseFile), join(dir, binaryPrefix + '-latest' + releaseExtension))
-      } else {
-        updateSymlinkSync(join(dir, binaryPrefix + '-latest' + releaseExtension), latestReleaseFile)
-      }
+      updateSymlinkSync(join(dir, binaryPrefix + '-latest' + releaseExtension), latestReleaseFile)
     }
 
     // Update 'nightly' symlink in bin/ (we don't have nightlies for other platforms)
